@@ -13,6 +13,9 @@ export interface User {
   program?: string;
   year?: string;
   bio?: string;
+  cohort?: string; // Links student to specific JSON timetable section (e.g., 'BAPM_2025_Section_A')
+  status?: 'active' | 'suspended'; // New for admin management
+  lastActive?: string;
 }
 
 export interface PeerTutor {
@@ -28,6 +31,7 @@ export interface PeerTutor {
   points: number;
   expertise: string[]; // e.g., ["Python", "Calculus"]
   bio: string;
+  email?: string;
 }
 
 export interface Instructor {
@@ -68,8 +72,10 @@ export interface ManagedSession {
   time: string;
   comment: string;
   targetStudents: string[];
-  status: 'scheduled' | 'feedback-pending' | 'completed';
+  status: 'scheduled' | 'waiting-for-responses' | 'ready-to-collect' | 'completed';
   feedbackCollected: boolean;
+  totalStudentCount: number;
+  respondedCount: number;
 }
 
 export interface TutorRequest extends Session {
@@ -92,6 +98,16 @@ export interface Feedback {
   cohort?: string;
   program?: string;
   section?: string;
+}
+
+export interface TutorRating {
+  id: string;
+  studentName: string;
+  rating: number; // 1-6
+  comment: string;
+  isAnonymous: boolean;
+  date: string;
+  course: string;
 }
 
 export interface Suggestion {
@@ -155,4 +171,41 @@ export interface AdminStat {
   value: string | number;
   change: string;
   trend: 'up' | 'down' | 'neutral';
+  color?: string;
+}
+
+export interface ClassData {
+  term: string;
+  program: string;
+  year: string;
+  section: string;
+  course: string;
+  day: string;
+  time: string;
+  classroom: string;
+  instructor: string;
+}
+
+export interface SystemAlert {
+  id: string;
+  message: string;
+  severity: 'high' | 'medium' | 'low';
+  timestamp: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  user: string;
+  action: string;
+  target: string;
+  timestamp: string;
+  icon: any;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  head: string;
+  staffCount: number;
+  suggestionCount: number;
 }

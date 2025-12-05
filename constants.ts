@@ -1,6 +1,6 @@
 
-import { User, Feedback, Suggestion, Appointment, ChartData, PeerTutor, Session, Instructor, FullTimetable, Notification, TutorRequest, AdminStat } from './types';
-import { LayoutDashboard, BookOpen, MessageSquare, Calendar, Users, BarChart2, Star, Shield, Building2, UserCircle, Award } from 'lucide-react';
+import { User, Feedback, Suggestion, Appointment, ChartData, PeerTutor, Session, Instructor, FullTimetable, Notification, TutorRequest, AdminStat, TutorRating, SystemAlert, ActivityLog, Department } from './types';
+import { LayoutDashboard, BookOpen, MessageSquare, Calendar, Users, BarChart2, Star, Shield, Building2, UserCircle, Award, Trophy, Settings, AlertTriangle, Activity, Database, Server, Zap, MousePointerClick } from 'lucide-react';
 
 export const MOCK_USER_STUDENT: User = {
   id: 's1',
@@ -8,10 +8,11 @@ export const MOCK_USER_STUDENT: User = {
   role: 'student',
   avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   email: 'liam.g@scholarx.edu',
-  program: 'Computer Science',
-  year: 'Year 3',
+  program: 'BAPM',
+  year: 'Year 2', // Changed to Year 2 to test peer tutor filtering (should see Year 2,3,4)
+  cohort: 'BAPM_2025_Section_A', // Matches JSON key
   phone: '+1 (555) 012-3456',
-  bio: 'Computer Science student passionate about AI and Web Development.'
+  bio: 'BAPM student passionate about Project Management and AI.'
 };
 
 export const INSTRUCTOR_BADGES = [
@@ -49,7 +50,8 @@ export const MOCK_USER_TUTOR: User = {
   program: 'Data Science',
   points: 12500,
   phone: '+1 (555) 123-4567',
-  year: 'Year 3'
+  year: 'Year 3',
+  bio: 'Helping students bridge the gap between theory and code. Gold Badge Tutor.'
 };
 
 export const MOCK_USER_ADMIN: User = {
@@ -66,6 +68,8 @@ export const MOCK_PEER_TUTORS: PeerTutor[] = [
   { id: 't3', name: 'Emily Davis', role: 'tutor', program: 'Literature', year: 'Year 4', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', badge: 'Bronze', stars: 4.9, phone: '+1 (555) 345-6789', points: 2100, expertise: ['Essay Writing', 'Analysis'], bio: 'Can help review your final papers.' },
   { id: 't4', name: 'David Kim', role: 'tutor', program: 'Mathematics', year: 'Year 2', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', badge: 'Silver', stars: 5.5, phone: '+1 (555) 456-7890', points: 5400, expertise: ['Calculus', 'Algebra'], bio: 'Math doesn\'t have to be hard.' },
   { id: 't5', name: 'Jessica Wong', role: 'tutor', program: 'Biology', year: 'Year 3', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', badge: 'Gold', stars: 5.9, phone: '+1 (555) 567-8901', points: 15000, expertise: ['Genetics', 'Cell Bio'], bio: 'Ace your biology exams with me.' },
+  // Adding a Year 1 tutor to test filtering (should not appear for Year 2 student)
+  { id: 't6', name: 'Fresher Tim', role: 'tutor', program: 'General Studies', year: 'Year 1', avatar: 'https://ui-avatars.com/api/?name=Fresher+Tim&background=random', badge: 'Bronze', stars: 4.0, phone: '+1 (555) 999-0000', points: 100, expertise: ['Orientation', 'Basic Math'], bio: 'Helping new students settle in.' },
 ];
 
 export const MOCK_INSTRUCTORS: Instructor[] = [
@@ -73,6 +77,7 @@ export const MOCK_INSTRUCTORS: Instructor[] = [
   { id: 'i2', name: 'Jean Claude, S.', role: 'instructor', title: 'Senior Lecturer', department: 'Supply Chain', avatar: 'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', rating: 5.7, availableSlots: 2, specialty: 'Procurement', teachingYears: ['Year 2'], email: 'jc.supply@scholarx.edu', phone: '078-555-0102', bio: 'Focus on global supply chain logistics.', points: 5200, badge: 'Master Teacher' },
   { id: 'i3', name: 'Dr. Sam, B.', role: 'instructor', title: 'Associate Prof', department: 'Project Mgmt', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', rating: 6.0, availableSlots: 1, specialty: 'Strategic Mgmt', teachingYears: ['Year 1', 'Year 3'], email: 'sam.b@scholarx.edu', phone: '078-555-0103', bio: 'Strategic project planning and execution.', points: 8900, badge: 'Master Teacher' },
   { id: 'i4', name: 'Genevieve, U.', role: 'instructor', title: 'Lab Instructor', department: 'Marketing', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', rating: 5.5, availableSlots: 8, specialty: 'Principles of Marketing', teachingYears: ['Year 1'], email: 'genevieve@scholarx.edu', phone: '078-555-0104', bio: 'Digital marketing enthusiast.', points: 1200, badge: 'Mentorship Star' },
+  { id: 'i5', name: 'Moses, M.', role: 'instructor', title: 'Lecturer', department: 'Business', avatar: 'https://ui-avatars.com/api/?name=Moses+M', rating: 4.5, availableSlots: 5, specialty: 'Organizational Behavior', teachingYears: ['Year 1', 'Year 2'], email: 'moses@scholarx.edu', phone: '078-555-0105', bio: 'Focus on organizational psychology.', points: 3000, badge: 'Scholar Guide' },
 ];
 
 export const MOCK_SESSIONS: Session[] = [
@@ -80,11 +85,13 @@ export const MOCK_SESSIONS: Session[] = [
   { id: 'ses2', tutorId: 'i2', tutorName: 'Jean Claude, S.', subject: 'Supply Chain Review', date: '2025-10-26 10:00', status: 'upcoming', feedbackGiven: false, type: 'instructor', concern: 'I dont understand the new logistics model.' },
   { id: 'ses3', tutorId: 't3', tutorName: 'Emily Davis', subject: 'Essay Review', date: '2025-10-24 16:00', status: 'completed', feedbackGiven: true, type: 'peer' },
   { id: 'ses4', tutorId: 'i1', tutorName: 'Dieudonne, U.', subject: 'Econ Graphs Help', date: '2025-10-28 11:30', status: 'pending', feedbackGiven: false, type: 'instructor', concern: 'Struggling with elasticity concepts.' },
+  { id: 'ses5', tutorId: 'i5', tutorName: 'Moses, M.', subject: 'Org Behavior Case Study', date: '2025-10-29 09:00', status: 'upcoming', feedbackGiven: false, type: 'instructor', concern: 'Reviewing group project.' },
 ];
 
 export const MOCK_TUTOR_REQUESTS: TutorRequest[] = [
   { id: 'req1', tutorId: 't1', tutorName: 'Sarah Chen', studentName: 'Alex Mercer', studentAvatar: 'https://i.pravatar.cc/150?u=alex', requestTime: '10m ago', subject: 'Data Science 101', date: '2025-11-02 10:00', status: 'pending', feedbackGiven: false, type: 'peer', concern: 'Need help with Pandas library' },
   { id: 'req2', tutorId: 't1', tutorName: 'Sarah Chen', studentName: 'Jordan Lee', studentAvatar: 'https://i.pravatar.cc/150?u=jordan', requestTime: '1h ago', subject: 'Python Scripting', date: '2025-11-03 14:00', status: 'pending', feedbackGiven: false, type: 'peer', concern: 'Debugging assignment code' },
+  { id: 'req3', tutorId: 't1', tutorName: 'Sarah Chen', studentName: 'Taylor Swift', studentAvatar: 'https://i.pravatar.cc/150?u=taylor', requestTime: '2h ago', subject: 'R Studio Setup', date: '2025-11-01 09:00', status: 'completed', feedbackGiven: true, type: 'peer', concern: 'Installation issues' },
 ];
 
 export const MOCK_INSTRUCTOR_FEEDBACK: Feedback[] = [
@@ -94,6 +101,19 @@ export const MOCK_INSTRUCTOR_FEEDBACK: Feedback[] = [
   { id: 'f4', studentName: 'Sarah L.', rating: 6, comment: 'Loved the guest speaker today. Very inspiring!', isAnonymous: false, timestamp: '1d ago', category: 'thankful', cohort: 'BAPM_2025', section: 'Section_A', program: 'BAPM' },
   { id: 'f5', studentName: 'Anonymous', rating: 4, comment: 'Can we have more practice problems for the exam?', isAnonymous: true, timestamp: '2d ago', category: 'struggling', cohort: 'BsBA_2025', section: 'Section_C', program: 'BsBA' },
   { id: 'f6', studentName: 'Mike T.', rating: 5, comment: 'Great pace, but the room was too cold.', isAnonymous: false, timestamp: '2d ago', category: 'uncategorized', cohort: 'BAPM_2025', section: 'Section_A', program: 'BAPM' },
+];
+
+export const MOCK_TUTOR_RATINGS: TutorRating[] = [
+  { id: 'r1', studentName: 'Alex Mercer', rating: 6, comment: 'Sarah is the best! She explained Pandas in a way that actually made sense.', isAnonymous: false, date: '2 days ago', course: 'Data Science 101' },
+  { id: 'r2', studentName: 'Anonymous', rating: 5, comment: 'Very helpful, but we ran out of time.', isAnonymous: true, date: '1 week ago', course: 'Python Basics' },
+  { id: 'r3', studentName: 'Jordan Lee', rating: 6, comment: 'Saved my assignment. Highly recommend!', isAnonymous: false, date: '2 weeks ago', course: 'Python Scripting' },
+];
+
+export const WEEKLY_POINTS_DATA: ChartData[] = [
+  { name: 'Week 1', value: 1200 },
+  { name: 'Week 2', value: 1800 },
+  { name: 'Week 3', value: 1500 },
+  { name: 'Week 4', value: 2400 },
 ];
 
 export const DEPARTMENTS = [
@@ -114,10 +134,12 @@ export const NAV_ITEMS = {
     { id: 'suggestions', label: 'Suggestions', icon: Building2 },
   ],
   tutor: [
-    { id: 'dashboard', label: 'Tutor Hub', icon: LayoutDashboard },
-    { id: 'requests', label: 'Help Requests', icon: BookOpen },
-    { id: 'chat', label: 'Messages', icon: MessageSquare },
-    { id: 'rewards', label: 'Badges & Points', icon: Star },
+    { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
+    { id: 'appointments', label: 'Appointments', icon: Calendar },
+    { id: 'ratings', label: 'Ratings', icon: Star },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+    { id: 'chat', label: 'Chat', icon: MessageSquare },
+    { id: 'profile', label: 'Profile', icon: UserCircle },
   ],
   instructor: [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
@@ -126,15 +148,18 @@ export const NAV_ITEMS = {
     { id: 'classes', label: 'Classes', icon: BookOpen },
     { id: 'chat', label: 'Chat', icon: MessageSquare },
   ],
-  department: [
-    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-    { id: 'suggestions', label: 'Inbox', icon: Building2 },
-    { id: 'analytics', label: 'Reports', icon: BarChart2 },
-  ],
   admin: [
     { id: 'dashboard', label: 'Master View', icon: Shield },
     { id: 'users', label: 'User Management', icon: Users },
-    { id: 'reports', label: 'Global Analytics', icon: BarChart2 },
+    { id: 'departments', label: 'Departments', icon: Building2 },
+    { id: 'feedback', label: 'Feedback Overview', icon: MessageSquare },
+    { id: 'appointments', label: 'Appointments', icon: Calendar },
+    { id: 'tutors', label: 'Peer Tutors', icon: Award },
+    { id: 'instructors', label: 'Instructors', icon: BookOpen },
+    { id: 'suggestions', label: 'Suggestions', icon: Zap },
+    { id: 'leaderboard', label: 'Leaderboards', icon: Trophy },
+    { id: 'reports', label: 'Reports', icon: BarChart2 },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ],
 };
 
@@ -149,10 +174,32 @@ export const ANALYTICS_DATA: ChartData[] = [
 ];
 
 export const ADMIN_STATS: AdminStat[] = [
-  { label: 'Total Users', value: 24500, change: '+12%', trend: 'up' },
-  { label: 'Active Sessions', value: 142, change: '+5%', trend: 'up' },
-  { label: 'Feedback Sat.', value: '94%', change: '-1%', trend: 'down' },
-  { label: 'Reports', value: 15, change: '0%', trend: 'neutral' },
+  { label: 'Total Students', value: 12450, change: '+12%', trend: 'up', color: 'text-violet-400' },
+  { label: 'Instructors', value: 842, change: '+5%', trend: 'up', color: 'text-cyan-400' },
+  { label: 'Peer Tutors', value: 320, change: '+8%', trend: 'up', color: 'text-orange-400' },
+  { label: 'Sessions Today', value: 142, change: '-2%', trend: 'down', color: 'text-green-400' },
+  { label: 'Feedback Today', value: 89, change: '+15%', trend: 'up', color: 'text-pink-400' },
+  { label: 'Active Chats', value: 45, change: '0%', trend: 'neutral', color: 'text-blue-400' },
+];
+
+export const MOCK_SYSTEM_ALERTS: SystemAlert[] = [
+  { id: '1', message: 'High API Latency detected in Region US-East', severity: 'medium', timestamp: '10m ago' },
+  { id: '2', message: 'Database backup completed successfully', severity: 'low', timestamp: '1h ago' },
+  { id: '3', message: 'Suspicious login attempt blocked for user ID: i5', severity: 'high', timestamp: '2h ago' },
+];
+
+export const MOCK_ACTIVITY_FEED: ActivityLog[] = [
+  { id: '1', user: 'Liam G.', action: 'booked a session', target: 'Dieudonne, U.', timestamp: '5m ago', icon: Calendar },
+  { id: '2', user: 'Sarah Chen', action: 'earned badge', target: 'Gold Tutor', timestamp: '15m ago', icon: Trophy },
+  { id: '3', user: 'System', action: 'generated report', target: 'Weekly Analytics', timestamp: '1h ago', icon: BarChart2 },
+  { id: '4', user: 'Anonymous', action: 'submitted feedback', target: 'BAPM_2025', timestamp: '2h ago', icon: MessageSquare },
+];
+
+export const MOCK_DEPARTMENTS: Department[] = [
+  { id: 'd1', name: 'IT Support', head: 'James Root', staffCount: 12, suggestionCount: 45 },
+  { id: 'd2', name: 'Dining Services', head: 'Martha Stew', staffCount: 25, suggestionCount: 12 },
+  { id: 'd3', name: 'Library', head: 'Booker T.', staffCount: 8, suggestionCount: 5 },
+  { id: 'd4', name: 'Academics', head: 'Dr. Strange', staffCount: 50, suggestionCount: 89 },
 ];
 
 export const RECENT_SUGGESTIONS: Suggestion[] = [
@@ -194,6 +241,9 @@ export const REAL_TIMETABLE_DATA: FullTimetable = {
 } as any; 
 
 export const PEER_TUTOR_LEADERBOARD = [
-  { id: '1', name: 'Sarah Chen', points: 12500, badge: 'Gold', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Data Science' },
-  { id: '2', name: 'Marcus Johnson', points: 9200, badge: 'Silver', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Physics' },
+  { id: '1', name: 'Sarah Chen', points: 12500, badge: 'Gold', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Data Science', rating: 5.8 },
+  { id: '2', name: 'Marcus Johnson', points: 9200, badge: 'Silver', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Physics', rating: 5.2 },
+  { id: '3', name: 'Jessica Wong', points: 8500, badge: 'Silver', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Biology', rating: 5.5 },
+  { id: '4', name: 'David Kim', points: 6400, badge: 'Bronze', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Math', rating: 5.0 },
+  { id: '5', name: 'Emily Davis', points: 4100, badge: 'Bronze', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80', subject: 'Literature', rating: 4.9 },
 ];
